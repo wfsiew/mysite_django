@@ -1,0 +1,40 @@
+cd C:\Users\User\Documents\repo\django-cerpa-admin
+python setup.py sdist
+
+cd C:\Users\User\Documents\repo\django-cerpa-purchase
+
+python -m virtualenv virtual
+.\virtual\Scripts\activate
+pip install ../django-cerpa-admin/dist/django-cerpa-admin-0.1.tar.gz
+pip install -r requirements.txt
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py loaddata tests/initial_test_data.json
+
+python manage.py runserver 0.0.0.0:8100
+
+python manage.py dumpdata > db.json
+
+==========================
+
+username: pstaff, password123
+admin, password123
+
+curl -X POST -d "grant_type=password&username=pstaff&password=password123&client_id=ElHqJ96DlTJ93uOVBr5Bgmf2pBiojpaGbrQm5dsp"  http://localhost:8100/o/token/
+
+===========================
+
+ps -e --> to list running programs
+cd /opt/apps/django-cerpa-purchase/
+nohup ./server.py > /dev/null 2>&1 &
+
+or
+
+nohup /usr/bin/python3.6 /opt/apps/django-cerpa-purchase/server.py > /dev/null 2>&1 & --> run server.py in /etc/rc.d/rc.local
+ps ax | grep -v grep | grep server.py
+ps ax | grep -v grep | grep python3.6 --> to get the PID
+kill -9 $(ps -ef | grep -v grep | grep server.py | awk '{print $2}') --> kill the server.py
+kill -9 PID --> kill the process
+
+setsebool -P httpd_can_network_connect 1 --> set permission for selinux to connect via http
